@@ -46,8 +46,8 @@ export const Navbar = () => {
             <Layout className="text-dark w-5 h-5" />
           </div>
           <div className="flex flex-col">
-            <span className="font-inter font-extrabold text-white text-lg tracking-tight leading-none">ClipConnect</span>
-            <span className="text-[10px] text-white/30 font-bold uppercase tracking-[0.2em] mt-0.5">Themes</span>
+            <span className="font-inter font-extrabold text-white text-lg tracking-tight leading-none">Lovable Themes</span>
+            <span className="text-[10px] text-white/30 font-bold uppercase tracking-[0.2em] mt-0.5">Premium Marketplace</span>
           </div>
         </Link>
 

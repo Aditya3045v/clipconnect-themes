@@ -89,7 +89,7 @@ export const Auth = () => {
             playsInline
             className="w-full h-full object-cover"
           >
-            <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260402_143803_f635b644-d959-4f16-9d29-cedaeb5c6de0.mp4" type="video/mp4" />
+            <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260331_074327_a4d6275d-82d9-4c83-bfbe-f1fb2213c17c.mp4" type="video/mp4" />
           </video>
           <div className="absolute inset-0 bg-dark/70 backdrop-blur-[2px]" />
         </div>
@@ -110,7 +110,7 @@ export const Auth = () => {
               {isLogin ? 'Welcome Back' : 'Get Started'}
             </h1>
             <p className="text-white/60">
-              {isLogin ? 'Log in to manage your premium themes.' : 'Join 2,000+ creators building with ClipConnect.'}
+              {isLogin ? 'Log in to manage your premium themes.' : 'Join 2,000+ creators building with Lovable Themes.'}
             </p>
           </div>
 

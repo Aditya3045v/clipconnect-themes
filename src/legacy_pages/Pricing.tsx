@@ -12,7 +12,7 @@ const pricingOptions = [
     features: [
       "Access to all 12+ themes",
       "1 Year of weekly updates",
-      "Instant Lovable remix link",
+      "Instant Lovable Themes remix link",
       "Personal license (1 project)",
       "Standard Discord support"
     ],
@@ -39,7 +39,7 @@ const pricingOptions = [
 ];
 
 const faq = [
-  { question: "What do I get with my purchase?", answer: "You will receive an instant remix link to quickly import all the themes and components directly into your Lovable account, along with lifetime access to all future updates and templates." },
+  { question: "What do I get with my purchase?", answer: "You will receive an instant remix link to quickly import all the themes and components directly into your Lovable Themes project, along with lifetime access to all future updates and templates." },
   { question: "Can I use themes for commercial work?", answer: "Yes! Both plans include commercial licenses. The Enterprise plan allows for unlimited projects." },
   { question: "Do you offer refunds?", answer: "We offer a 30-day money-back guarantee if you're not satisfied with the product quality." }
 ];

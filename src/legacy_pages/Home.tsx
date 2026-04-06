@@ -245,7 +245,7 @@ export const Home = () => {
                   "Monthly new template drops",
                   "Commercial use license",
                   "24/7 Dedicated Discord support",
-                  "Instant Lovable remix link"
+                  "Instant Lovable Themes remix link"
                 ].map((item) => (
                   <div key={item} className="flex items-center gap-4">
                     <div className="w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
