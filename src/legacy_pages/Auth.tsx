@@ -85,7 +85,11 @@ export const Auth = () => {
       navigate('/templates');
       window.dispatchEvent(new Event('storage'));
     } catch (err: any) {
-      setError(err.message);
+      if (err.message === 'Failed to fetch') {
+        setError('Connection error: Please ensure your .env file has valid VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.');
+      } else {
+        setError(err.message);
+      }
     } finally {
       setLoading(false);
     }
@@ -141,7 +145,7 @@ export const Auth = () => {
                     type="text" 
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-white placeholder-white/20 focus:outline-none focus:border-white/30 transition-all"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-white placeholder-white/20 focus:outline-none focus:border-white/30 transition-all font-cabin"
                     placeholder="John Doe"
                     required={!isLogin}
                   />
@@ -156,7 +160,7 @@ export const Auth = () => {
                     type="email" 
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white placeholder-white/20 focus:outline-none focus:border-white/30 transition-all"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white placeholder-white/20 focus:outline-none focus:border-white/30 transition-all font-cabin"
                     placeholder="name@example.com"
                     required
                   />
@@ -171,7 +175,7 @@ export const Auth = () => {
                     type="password" 
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white placeholder-white/20 focus:outline-none focus:border-white/30 transition-all"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white placeholder-white/20 focus:outline-none focus:border-white/30 transition-all font-cabin"
                     placeholder="••••••••"
                     required
                   />
@@ -183,9 +187,9 @@ export const Auth = () => {
               <motion.div 
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="mt-4 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs"
+                className="mt-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm flex items-start gap-2"
               >
-                {error}
+                <p>{error}</p>
               </motion.div>
             )}
 
@@ -212,44 +216,54 @@ export const Auth = () => {
       </div>
 
       {/* Right Side: User Stories & Testimonials */}
-      <div className="hidden md:flex w-1/2 bg-white flex-col justify-between p-12 lg:p-20 relative">
-        <div className="absolute top-0 right-0 p-12 opacity-[0.03] select-none pointer-events-none">
-          <Quote className="w-64 h-64 text-dark" />
+      <div className="hidden md:flex w-1/2 bg-black flex-col justify-between p-12 lg:p-20 relative">
+        {/* Background Video Right Side */}
+        <div className="absolute inset-0 z-0">
+          <video 
+            autoPlay 
+            loop 
+            muted 
+            playsInline
+            className="w-full h-full object-cover"
+          >
+            <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260322_013248_a74099a8-be2b-4164-a823-eddd5e149fa1.mp4" type="video/mp4" />
+          </video>
+          <div className="absolute inset-0 bg-black/80" />
         </div>
 
-        <div>
+        <div className="relative z-10">
           <div className="flex items-center gap-2 mb-12">
             <div className="flex -space-x-2">
               {[1, 2, 3, 4].map(i => (
                 <div key={i} className="w-8 h-8 rounded-full border-2 border-white bg-dark/10" />
               ))}
             </div>
-            <p className="text-xs font-bold uppercase tracking-widest text-dark/30">Trusted by 2k+ Users</p>
+            <p className="text-xs font-bold uppercase tracking-widest text-white/30">Trusted by 2k+ Users</p>
           </div>
 
-          <h2 className="text-5xl font-inter font-bold leading-tight text-dark mb-8">
+          <h2 className="text-5xl font-inter font-bold leading-tight text-white mb-8">
             Create high-converting content with <span className="text-secondary">premium themes.</span>
           </h2>
           
           <div className="space-y-6 max-w-lg">
-            <div className="flex gap-4 p-4 rounded-2xl bg-dark/5 border border-dark/5">
+            <div className="flex gap-4 p-4 rounded-2xl bg-white/5 border border-white/5">
               <CheckCircle2 className="w-6 h-6 text-secondary shrink-0" />
               <div>
-                <h3 className="font-bold text-dark">One-time payment, lifetime access</h3>
-                <p className="text-dark/50 text-sm">No recurring fees for individual templates. Buy once, use forever.</p>
+                <h3 className="font-bold text-white">One-time payment, lifetime access</h3>
+                <p className="text-white/50 text-sm">No recurring fees for individual templates. Buy once, use forever.</p>
               </div>
             </div>
-            <div className="flex gap-4 p-4 rounded-2xl bg-dark/5 border border-dark/5">
+            <div className="flex gap-4 p-4 rounded-2xl bg-white/5 border border-white/5">
               <CheckCircle2 className="w-6 h-6 text-secondary shrink-0" />
               <div>
-                <h3 className="font-bold text-dark">Remix in one click</h3>
-                <p className="text-dark/50 text-sm">Direct links to Remix. No complex setup or technical knowledge needed.</p>
+                <h3 className="font-bold text-white">Remix in one click</h3>
+                <p className="text-white/50 text-sm">Direct links to Remix. No complex setup or technical knowledge needed.</p>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="mt-auto space-y-8">
+        <div className="mt-auto space-y-8 relative z-10">
           <div className="grid grid-cols-1 gap-6">
             <AnimatePresence mode="wait">
               <motion.div 
@@ -257,7 +271,7 @@ export const Auth = () => {
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
-                className="p-8 rounded-[2.5rem] bg-dark text-white relative overflow-hidden"
+                className="p-8 rounded-[2.5rem] bg-white text-dark relative overflow-hidden"
               >
                 <div className="flex gap-1 mb-4">
                   {[1, 2, 3, 4, 5].map(i => <Star key={i} className="w-4 h-4 fill-secondary text-secondary" />)}
@@ -269,7 +283,7 @@ export const Auth = () => {
                   <img src={isLogin ? testimonials[0].avatar : testimonials[1].avatar} className="w-12 h-12 rounded-full" alt="avatar" />
                   <div>
                     <p className="font-bold">{isLogin ? testimonials[0].name : testimonials[1].name}</p>
-                    <p className="text-white/40 text-sm">{isLogin ? testimonials[0].role : testimonials[1].role}</p>
+                    <p className="text-dark/40 text-sm">{isLogin ? testimonials[0].role : testimonials[1].role}</p>
                   </div>
                 </div>
               </motion.div>
