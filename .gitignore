@@ -1,0 +1,22 @@
+node_modules/
+build/
+dist/
+coverage/
+.DS_Store
+*.log
+.env
+.env.local
+.env.production
+.next/
+.cache/
+build_output.log
+output.txt
+ts_errors.txt
+vite_error.log
+test-import.js
+download_images.cjs
+metadata.json
+
+# Template preview images (large — host on CDN or Supabase Storage instead)
+# Comment this out if you want to commit them
+public/templates/

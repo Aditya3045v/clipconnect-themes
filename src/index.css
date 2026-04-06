@@ -1,0 +1,49 @@
+@import "tailwindcss";
+
+@theme {
+  --font-instrument: "Instrument Serif", serif;
+  --font-manrope: "Manrope", sans-serif;
+  --font-cabin: "Cabin", sans-serif;
+  --font-inter: "Inter", sans-serif;
+
+  --color-dark: #050505;
+}
+
+:root {
+  background-color: var(--color-dark);
+  color: white;
+}
+
+html {
+  /* Scale down the entire UI globally */
+  font-size: 85%; /* ~13.6px base on mobile for more breathing room */
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 90%; /* Exactly 10% scale down globally on desktop */
+  }
+}
+
+body {
+  font-family: var(--font-inter);
+  overflow-x: hidden;
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-light {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.text-gradient {
+  background: linear-gradient(to right, #fff, #a1a1a1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
