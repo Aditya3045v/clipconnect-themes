@@ -1,29 +1,14 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { ArrowLeft, Mail, Lock, ArrowRight, CheckCircle2, Star, Quote } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { supabase } from '../lib/supabase';
-
-const testimonials = [
-  {
-    name: "Rahul Sharma",
-    role: "Content Creator",
-    content: "ClipConnect themes completely changed my workflow. I used to spend hours on design, now it's just minutes.",
-    avatar: "https://i.pravatar.cc/150?u=rahul"
-  },
-  {
-    name: "Sarah Chen",
-    role: "Agency Owner",
-    content: "The premium themes are worth every rupee. My clients are consistently impressed by the quality of my output.",
-    avatar: "https://i.pravatar.cc/150?u=sarah"
-  },
-  {
-    name: "James Wilson",
-    role: "Social Media Manager",
-    content: "Fast, reliable, and stunning. The best investment I've made for my editing toolkit this year.",
-    avatar: "https://i.pravatar.cc/150?u=james"
-  }
-];
+import { 
+  Mail, 
+  Lock, 
+  ArrowRight, 
+  CheckCircle2, 
+  ArrowLeft,
+} from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 
 export const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -34,6 +19,20 @@ export const Auth = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
+  const handleGoogleAuth = async () => {
+    try {
+      const { error: googleError } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/templates`
+        }
+      });
+      if (googleError) throw googleError;
+    } catch (err: any) {
+      setError(err.message);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -41,23 +40,11 @@ export const Auth = () => {
     
     try {
       if (isLogin) {
-        const { data, error: loginError } = await supabase.auth.signInWithPassword({
+        const { error: loginError } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
         if (loginError) throw loginError;
-
-        // Fetch user profile for payment status
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('has_paid')
-          .eq('id', data.user.id)
-          .single();
-
-        localStorage.setItem('user', JSON.stringify({ 
-          email: data.user.email, 
-          hasPaid: profile?.has_paid || false 
-        }));
       } else {
         const { data, error: signUpError } = await supabase.auth.signUp({
           email,
@@ -70,11 +57,6 @@ export const Auth = () => {
         });
         if (signUpError) throw signUpError;
         
-        localStorage.setItem('user', JSON.stringify({ 
-          email: data.user?.email, 
-          hasPaid: false 
-        }));
-        
         if (!data.session) {
           setError('Please check your email for the confirmation link.');
           setLoading(false);
@@ -83,7 +65,6 @@ export const Auth = () => {
       }
       
       navigate('/templates');
-      window.dispatchEvent(new Event('storage'));
     } catch (err: any) {
       if (err.message === 'Failed to fetch') {
         setError('Connection error: Please ensure your .env file has valid VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.');
@@ -96,7 +77,7 @@ export const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-dark flex flex-col md:flex-row overflow-hidden italic-none">
+    <div className="min-h-screen bg-dark flex flex-col md:flex-row overflow-hidden">
       {/* Left Side: Auth & Video BG */}
       <div className="relative w-full md:w-1/2 flex items-center justify-center p-6 md:p-12 overflow-hidden">
         {/* Background Video */}
@@ -196,13 +177,36 @@ export const Auth = () => {
             <button 
               type="submit"
               disabled={loading}
-              className="w-full bg-white text-dark py-4 rounded-xl font-bold mt-8 flex items-center justify-center gap-2 hover:bg-white/90 transition-all active:scale-[0.98] disabled:opacity-50"
+              className="w-full bg-white text-dark py-4 rounded-xl font-bold mt-8 flex items-center justify-center gap-2 hover:bg-white/90 transition-all active:scale-[0.98] disabled:opacity-50 shadow-xl"
             >
               {loading ? 'Processing...' : isLogin ? 'Sign In' : 'Create Account'}
               {!loading && <ArrowRight className="w-4 h-4" />}
             </button>
 
-            <div className="mt-6 text-center">
+            <div className="relative my-8">
+              <div className="absolute inset-0 flex items-center">
+                <hr className="w-full border-white/10" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-dark/40 px-2 text-white/30 backdrop-blur-sm">Or continue with</span>
+              </div>
+            </div>
+
+            <button 
+              type="button"
+              onClick={handleGoogleAuth}
+              className="w-full glass border-white/10 text-white py-3 rounded-xl font-medium flex items-center justify-center gap-3 hover:bg-white/5 transition-all text-sm mb-6"
+            >
+              <svg className="w-5 h-5" viewBox="0 0 24 24">
+                <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" />
+                <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.66l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+              </svg>
+              Sign in with Google
+            </button>
+
+            <div className="text-center">
               <button 
                 type="button"
                 onClick={() => setIsLogin(!isLogin)}
@@ -215,8 +219,8 @@ export const Auth = () => {
         </motion.div>
       </div>
 
-      {/* Right Side: User Stories & Testimonials */}
-      <div className="hidden md:flex w-1/2 bg-black flex-col justify-between p-12 lg:p-20 relative">
+      {/* Right Side: Cinematic Video BG */}
+      <div className="hidden md:flex w-1/2 bg-black flex-col justify-center p-12 lg:p-20 relative">
         {/* Background Video Right Side */}
         <div className="absolute inset-0 z-0">
           <video 
@@ -241,54 +245,32 @@ export const Auth = () => {
             <p className="text-xs font-bold uppercase tracking-widest text-white/30">Trusted by 2k+ Users</p>
           </div>
 
-          <h2 className="text-5xl font-inter font-bold leading-tight text-white mb-8">
-            Create high-converting content with <span className="text-secondary">premium themes.</span>
-          </h2>
-          
-          <div className="space-y-6 max-w-lg">
-            <div className="flex gap-4 p-4 rounded-2xl bg-white/5 border border-white/5">
-              <CheckCircle2 className="w-6 h-6 text-secondary shrink-0" />
-              <div>
-                <h3 className="font-bold text-white">One-time payment, lifetime access</h3>
-                <p className="text-white/50 text-sm">No recurring fees for individual templates. Buy once, use forever.</p>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <h2 className="text-6xl font-inter font-bold leading-tight text-white mb-8 max-w-md">
+              Create viral content with <span className="text-secondary">premium themes.</span>
+            </h2>
+            
+            <div className="space-y-6 max-w-lg">
+              <div className="flex gap-4 p-5 rounded-3xl bg-white/5 border border-white/5 backdrop-blur-md">
+                <CheckCircle2 className="w-6 h-6 text-secondary shrink-0" />
+                <div>
+                  <h3 className="font-bold text-white">One-time payment, lifetime access</h3>
+                  <p className="text-white/50 text-sm">No recurring fees for individual templates. Buy once, use forever.</p>
+                </div>
+              </div>
+              <div className="flex gap-4 p-5 rounded-3xl bg-white/5 border border-white/5 backdrop-blur-md">
+                <CheckCircle2 className="w-6 h-6 text-secondary shrink-0" />
+                <div>
+                  <h3 className="font-bold text-white">Remix in one click</h3>
+                  <p className="text-white/50 text-sm">Direct links to Remix. No complex setup or technical knowledge needed.</p>
+                </div>
               </div>
             </div>
-            <div className="flex gap-4 p-4 rounded-2xl bg-white/5 border border-white/5">
-              <CheckCircle2 className="w-6 h-6 text-secondary shrink-0" />
-              <div>
-                <h3 className="font-bold text-white">Remix in one click</h3>
-                <p className="text-white/50 text-sm">Direct links to Remix. No complex setup or technical knowledge needed.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-auto space-y-8 relative z-10">
-          <div className="grid grid-cols-1 gap-6">
-            <AnimatePresence mode="wait">
-              <motion.div 
-                key={isLogin ? 'login-test' : 'signup-test'}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                className="p-8 rounded-[2.5rem] bg-white text-dark relative overflow-hidden"
-              >
-                <div className="flex gap-1 mb-4">
-                  {[1, 2, 3, 4, 5].map(i => <Star key={i} className="w-4 h-4 fill-secondary text-secondary" />)}
-                </div>
-                <p className="text-lg font-medium leading-relaxed mb-6">
-                  "{isLogin ? testimonials[0].content : testimonials[1].content}"
-                </p>
-                <div className="flex items-center gap-4">
-                  <img src={isLogin ? testimonials[0].avatar : testimonials[1].avatar} className="w-12 h-12 rounded-full" alt="avatar" />
-                  <div>
-                    <p className="font-bold">{isLogin ? testimonials[0].name : testimonials[1].name}</p>
-                    <p className="text-dark/40 text-sm">{isLogin ? testimonials[0].role : testimonials[1].role}</p>
-                  </div>
-                </div>
-              </motion.div>
-            </AnimatePresence>
-          </div>
+          </motion.div>
         </div>
       </div>
     </div>

@@ -11,6 +11,7 @@ import { Templates } from './legacy_pages/Templates';
 import { Privacy, Terms, Refund } from './legacy_pages/Legal';
 import { Auth } from './legacy_pages/Auth';
 import { PaymentStatus } from './legacy_pages/PaymentStatus';
+import { AuthProvider, useAuth } from './lib/auth-context';
 
 // ScrollToTop component to reset scroll position on route changes
 const ScrollToTop = () => {
@@ -23,13 +24,14 @@ const ScrollToTop = () => {
 
 function App() {
   return (
-    <Router>
-      <ScrollToTop />
-      <div className="min-h-screen bg-dark text-white selection:bg-white selection:text-dark font-inter">
-        <ConditionalNavbar />
-        
-        <main>
-          <Routes>
+    <AuthProvider>
+      <Router>
+        <ScrollToTop />
+        <div className="min-h-screen bg-dark text-white selection:bg-white selection:text-dark font-inter">
+          <ConditionalNavbar />
+          
+          <main>
+            <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/features" element={<Features />} />
             <Route path="/templates" element={<Templates />} />
@@ -49,6 +51,7 @@ function App() {
         <ConditionalFooter />
       </div>
     </Router>
+    </AuthProvider>
   );
 }
 

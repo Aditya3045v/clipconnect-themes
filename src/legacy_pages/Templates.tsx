@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'motion/react';
-import { ArrowRight, Search, Filter, Layers, Zap, Info, Lock } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowRight, Layers, Lock, Unlock, CreditCard } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { useAuth } from '../lib/auth-context';
 
 const categories = ["All", "Dashboards", "SaaS", "E-commerce", "Portfolio", "Marketing"];
 
@@ -48,21 +49,27 @@ const templates = [
 ];
 
 export const Templates = () => {
+  const { user, profile } = useAuth();
   const [activeCategory, setActiveCategory] = useState("All");
   const [isProcessing, setIsProcessing] = useState(false);
   const navigate = useNavigate();
 
   const handleRemix = async (templateName: string) => {
-    const { data: { session } } = await supabase.auth.getSession();
-    const token = session?.access_token;
-    
-    if (!token) {
+    if (!user) {
       navigate('/login');
+      return;
+    }
+
+    if (!profile?.has_paid) {
+      navigate('/pricing');
       return;
     }
 
     setIsProcessing(true);
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      
       const response = await fetch(`/api/secure-link?template=${encodeURIComponent(templateName)}`, {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -73,19 +80,13 @@ export const Templates = () => {
       
       if (response.ok) {
         window.open(data.link, '_blank');
-      } else if (response.status === 403) {
-        // Not paid — go to pricing
-        navigate('/pricing');
       } else if (response.status === 404) {
         alert(`The remix link for "${templateName}" is coming soon. Check back shortly!`);
       } else {
-        // Expired/invalid token
-        await supabase.auth.signOut();
-        localStorage.removeItem('user');
-        navigate('/login');
+        alert("Unexpected error fetching secure link.");
       }
     } catch {
-      navigate('/login');
+      alert("Failed to fetch secure link. Please try again.");
     } finally {
       setIsProcessing(false);
     }
@@ -120,10 +121,10 @@ export const Templates = () => {
             animate={{ opacity: 1, scale: 1 }}
             className="text-5xl sm:text-6xl md:text-8xl lg:text-9xl font-inter font-bold tracking-tight mb-6 md:mb-8"
           >
-            A Universe of <span className="text-gradient font-instrument italic font-normal">Inspiration</span>.
+            A Universe of <span className="text-gradient font-instrument italic font-normal">Themes</span>.
           </motion.h1>
           <p className="text-base md:text-xl text-white/70 max-w-2xl mx-auto mb-10 md:mb-16">
-            The world's most comprehensive library of premium components and templates, designed for scale and conversion.
+            Access the world's most comprehensive library of premium components and templates. Built for performance.
           </p>
           
           <div className="flex flex-wrap items-center justify-center gap-2">
@@ -159,37 +160,65 @@ export const Templates = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95 }}
               transition={{ duration: 0.4 }}
-              className="group glass border-white/10 rounded-[3rem] overflow-hidden hover:border-white/30 transition-all flex flex-col p-2 h-full"
+              className="group glass border-white/10 rounded-[3rem] overflow-hidden hover:border-white/30 transition-all flex flex-col p-2 h-full relative"
             >
                <div className="relative aspect-video rounded-[2.5rem] overflow-hidden mb-8">
                   <img src={template.image} alt={template.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-dark/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-between p-8">
-                    <span className="bg-white text-dark px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest">{template.category}</span>
-                    <button 
-                      onClick={() => handleRemix(template.name)}
-                      disabled={isProcessing}
-                      className="bg-white/10 backdrop-blur-xl text-white p-4 rounded-full border border-white/20 hover:bg-white hover:text-dark transition-all disabled:opacity-50 flex items-center gap-2"
-                    >
-                      <ArrowRight size={24} />
-                    </button>
+                  
+                  {/* Overlay */}
+                  <div className="absolute inset-0 bg-dark/40 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center p-8 text-center pointer-events-none group-hover:pointer-events-auto">
+                    {!profile?.has_paid ? (
+                      <div className="space-y-4">
+                        <div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center mx-auto mb-2 border border-white/20">
+                          <Lock size={24} className="text-secondary" />
+                        </div>
+                        <h4 className="font-bold text-white text-lg">Premium Template</h4>
+                        <button 
+                          onClick={(e) => { e.stopPropagation(); navigate('/pricing'); }}
+                          className="bg-secondary text-white px-6 py-2 rounded-full font-bold text-sm hover:scale-105 transition-all flex items-center gap-2 mx-auto"
+                        >
+                          <CreditCard size={16} />
+                          Unlock Now
+                        </button>
+                      </div>
+                    ) : (
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); handleRemix(template.name); }}
+                        disabled={isProcessing}
+                        className="bg-white text-dark px-8 py-3 rounded-full font-bold hover:scale-105 transition-all disabled:opacity-50 flex items-center gap-2"
+                      >
+                        <Unlock size={20} />
+                        {isProcessing ? 'Processing...' : 'Remix Template'}
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="absolute top-6 right-6">
+                    <span className="bg-white/10 backdrop-blur-md text-white/70 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest border border-white/10">{template.category}</span>
                   </div>
                </div>
+
                <div className="px-10 pb-10">
-                  <h3 className="text-2xl font-bold mb-2 group-hover:text-blue-400 transition-colors">{template.name}</h3>
+                  <h3 className="text-2xl font-bold mb-4 group-hover:text-secondary transition-colors">{template.name}</h3>
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-white/30 font-medium">
+                    <div className="flex items-center gap-2 text-white/30 font-medium text-sm">
                       <Layers size={16} />
-                      <span>Next.js + Vite Ready</span>
+                      <span>Next.js + Vite</span>
                     </div>
-                    <button
-                      onClick={() => handleRemix(template.name)}
-                      disabled={isProcessing}
-                      className="flex items-center gap-1.5 text-xs font-bold text-white/40 hover:text-white transition-colors group/remix"
-                    >
-                      <Lock size={12} className="group-hover/remix:hidden" />
-                      <ArrowRight size={12} className="hidden group-hover/remix:block" />
-                      Remix
-                    </button>
+                    
+                    {profile?.has_paid ? (
+                      <button
+                        onClick={() => handleRemix(template.name)}
+                        className="text-secondary font-bold text-sm flex items-center gap-2"
+                      >
+                        Remix <ArrowRight size={14} />
+                      </button>
+                    ) : (
+                      <div className="flex items-center gap-2 text-white/20 text-xs font-bold uppercase tracking-wider">
+                        <Lock size={12} />
+                        Locked
+                      </div>
+                    )}
                   </div>
                </div>
             </motion.div>
@@ -199,9 +228,9 @@ export const Templates = () => {
 
         <div className="mt-32 md:mt-40 p-10 md:p-20 glass border-white/10 rounded-[3rem] md:rounded-[4rem] text-center relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 -z-10" />
-          <h2 className="text-3xl md:text-6xl font-bold mb-6 md:mb-8">Can't Find What You Need?</h2>
+          <h2 className="text-3xl md:text-6xl font-bold mb-6 md:mb-8 text-white">Can't Find What You Need?</h2>
           <p className="text-lg md:text-xl text-white/50 mb-10 md:mb-12 max-w-2xl mx-auto">We build custom templates for enterprise clients. Let's discuss your specific requirements.</p>
-          <button className="bg-white text-dark px-8 py-4 md:px-10 md:py-5 rounded-full font-cabin font-extrabold text-lg md:text-xl hover:scale-105 transition-all">
+          <button className="bg-white text-dark px-10 py-5 rounded-full font-inter font-extrabold text-xl hover:scale-105 transition-all shadow-2xl">
             Get in Touch
           </button>
         </div>
