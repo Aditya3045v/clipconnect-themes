@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { ArrowLeft, Mail, Lock, ArrowRight } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import { supabase } from '../lib/supabase';
 
 export const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -17,22 +18,44 @@ export const Auth = () => {
     setError('');
     
     try {
-      const endpoint = isLogin ? '/api/auth/login' : '/api/auth/register';
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      });
-      
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.error || 'Authentication failed');
+      if (isLogin) {
+        const { data, error: loginError } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        if (loginError) throw loginError;
+
+        // Fetch user profile for payment status
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('has_paid')
+          .eq('id', data.user.id)
+          .single();
+
+        localStorage.setItem('supabase.auth.token', data.session.access_token);
+        localStorage.setItem('user', JSON.stringify({ 
+          email: data.user.email, 
+          hasPaid: profile?.has_paid || false 
+        }));
+      } else {
+        const { data, error: signUpError } = await supabase.auth.signUp({
+          email,
+          password,
+        });
+        if (signUpError) throw signUpError;
+        
+        // Supabase trigger will create the profile automatically
+        localStorage.setItem('user', JSON.stringify({ 
+          email: data.user?.email, 
+          hasPaid: false 
+        }));
+        
+        if (!data.session) {
+          setError('Please check your email for the confirmation link.');
+          setLoading(false);
+          return;
+        }
       }
-      
-      // Save token and user details to localStorage
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
       
       // Redirect to templates after successful auth
       navigate('/templates');

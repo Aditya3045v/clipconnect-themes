@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { CheckCircle, XCircle, Loader2, ArrowRight } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router-dom';
+import { supabase } from '../lib/supabase';
 
 type Status = 'verifying' | 'success' | 'failed';
 
@@ -20,7 +21,9 @@ export const PaymentStatus = () => {
 
     const verify = async () => {
       try {
-        const token = localStorage.getItem('token');
+        const { data: { session } } = await supabase.auth.getSession();
+        const token = session?.access_token;
+
         const response = await fetch('/api/verify-order', {
           method: 'POST',
           headers: {

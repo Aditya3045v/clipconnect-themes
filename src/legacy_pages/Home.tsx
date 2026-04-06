@@ -5,6 +5,8 @@ import { ArrowRight, Zap, Shield, Users, DollarSign, BarChart3, MoreHorizontal, 
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { load } from '@cashfreepayments/cashfree-js';
 
+import { supabase } from '../lib/supabase';
+
 // --- Mock Data ---
 const chartData = [
   { name: 'Jan', value: 4000 },
@@ -44,16 +46,26 @@ export const Home = () => {
   const navigate = useNavigate();
 
   const handlePayment = async (amount: number) => {
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (!session) {
+      navigate('/login');
+      return;
+    }
+
     setIsProcessing(true);
     try {
       const response = await fetch('/api/create-order', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`
+        },
         body: JSON.stringify({
           amount: amount,
-          customerId: `user_${Math.floor(Math.random() * 1000000)}`,
+          customerId: session.user.id,
           customerPhone: "9999999999",
-          customerEmail: "customer@example.com"
+          customerEmail: session.user.email
         })
       });
 

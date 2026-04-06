@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { ArrowRight, Search, Filter, Layers, Zap, Info, Lock } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 
 const categories = ["All", "Dashboards", "SaaS", "E-commerce", "Portfolio", "Marketing"];
 
@@ -52,7 +53,8 @@ export const Templates = () => {
   const navigate = useNavigate();
 
   const handleRemix = async (templateName: string) => {
-    const token = localStorage.getItem('token');
+    const { data: { session } } = await supabase.auth.getSession();
+    const token = session?.access_token;
     
     if (!token) {
       navigate('/login');
@@ -78,7 +80,7 @@ export const Templates = () => {
         alert(`The remix link for "${templateName}" is coming soon. Check back shortly!`);
       } else {
         // Expired/invalid token
-        localStorage.removeItem('token');
+        await supabase.auth.signOut();
         localStorage.removeItem('user');
         navigate('/login');
       }
