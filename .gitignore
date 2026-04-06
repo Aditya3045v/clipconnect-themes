@@ -19,4 +19,4 @@ metadata.json
 
 # Template preview images (large — host on CDN or Supabase Storage instead)
 # Comment this out if you want to commit them
-public/templates/
+# public/templates/
