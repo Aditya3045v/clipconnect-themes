@@ -26,7 +26,7 @@ function App() {
     <Router>
       <ScrollToTop />
       <div className="min-h-screen bg-dark text-white selection:bg-white selection:text-dark font-inter">
-        <Navbar />
+        <ConditionalNavbar />
         
         <main>
           <Routes>
@@ -42,15 +42,28 @@ function App() {
             <Route path="/login" element={<Auth />} />
             <Route path="/register" element={<Auth />} />
             <Route path="/payment-status" element={<PaymentStatus />} />
-            {/* Fallback to Home if route not found */}
             <Route path="*" element={<Home />} />
           </Routes>
         </main>
 
-        <Footer />
+        <ConditionalFooter />
       </div>
     </Router>
   );
 }
+
+const ConditionalNavbar = () => {
+  const { pathname } = useLocation();
+  const hideOn = ['/login', '/register'];
+  if (hideOn.includes(pathname)) return null;
+  return <Navbar />;
+};
+
+const ConditionalFooter = () => {
+  const { pathname } = useLocation();
+  const hideOn = ['/login', '/register'];
+  if (hideOn.includes(pathname)) return null;
+  return <Footer />;
+};
 
 export default App;
