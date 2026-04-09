@@ -138,7 +138,7 @@ async function startServer() {
   app.post('/api/verify-order', async (req, res) => {
     try {
       const { orderId } = req.body;
-      const response = await cashfree.PGOrderFetchPayments("2023-08-01", orderId);
+      const response = await cashfree.PGOrderFetchPayments(orderId);
       
       // Look for a SUCCESS payment
       const payments = response.data;
