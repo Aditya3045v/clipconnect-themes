@@ -55,8 +55,10 @@ export const Contact = () => {
                      <Mail className="text-blue-500" size={32} />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold mb-2">Email Us</h3>
-                    <p className="text-white/50 text-lg">support@lovable.com</p>
+                    <h3 className="text-xl font-bold mb-2">Contact Info</h3>
+                    <p className="text-white/50 text-lg">Email: support@lovable.com</p>
+                    <p className="text-white/50 text-lg">Phone: +91 99999 99999</p>
+                    <p className="text-white/50 text-lg text-sm mt-2">123 Tech Park, Sector 4, New Delhi, India 110001</p>
                   </div>
               </motion.div>
 

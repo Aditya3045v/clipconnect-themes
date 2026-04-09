@@ -35,7 +35,8 @@ const DashboardPreview = () => {
       <img 
         src="https://motionsites.ai/assets/hero-weblex-preview-BoIbrUHI.gif" 
         alt="Dashboard Preview" 
-        className="w-full h-auto object-cover rounded-[2.5rem]" 
+        loading="lazy"
+        className="w-full h-auto object-cover rounded-[2.5rem] bg-white/5" 
       />
     </motion.div>
   );
@@ -70,7 +71,7 @@ export const Home = () => {
       });
 
       const order = await response.json();
-      const cashfree = await load({ mode: "sandbox" });
+      const cashfree = await load({ mode: "production" });
       const checkoutOptions = {
         paymentSessionId: order.payment_session_id,
         redirectTarget: "_self",
@@ -99,7 +100,8 @@ export const Home = () => {
             muted 
             loop 
             playsInline
-            className="w-full h-full object-cover opacity-80"
+            preload="metadata"
+            className="w-full h-full object-cover opacity-80 bg-dark"
           >
             <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260314_131748_f2ca2a28-fed7-44c8-b9a9-bd9acdd5ec31.mp4" type="video/mp4" />
           </video>

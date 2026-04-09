@@ -13,9 +13,9 @@ const __dirname = path.dirname(__filename);
 
 // Initialize Cashfree
 const cashfree = new Cashfree(
-  CFEnvironment.SANDBOX,
-  process.env.CASHFREE_APP_ID || "TEST10416954f9640478643809051845961401",
-  process.env.CASHFREE_SECRET_KEY || "cfsk_ma_test_45348981440097103890251145_30026600",
+  CFEnvironment.PRODUCTION,
+  process.env.CASHFREE_APP_ID || "",
+  process.env.CASHFREE_SECRET_KEY || "",
   null, null, null, false // Disabling sentry for local dev
 );
 
@@ -100,12 +100,12 @@ async function startServer() {
 
   app.post('/api/create-order', async (req, res) => {
     try {
-      const { customerId, customerPhone, customerEmail, amount } = req.body;
+      const { customerId, customerPhone, customerEmail, amount, currency } = req.body;
       const { user } = await getUserProfile(req.headers.authorization);
       
       const request = {
         order_amount: amount || 499,
-        order_currency: "INR",
+        order_currency: currency || "INR",
         customer_details: {
           customer_id: user?.id || customerId || "guest",
           customer_phone: customerPhone || "9999999999",

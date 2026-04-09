@@ -13,10 +13,11 @@ export const Footer = () => {
           <span className="font-manrope font-bold text-lg tracking-tight">Lovable Themes</span>
         </Link>
         
-        <div className="flex gap-8 text-sm text-white/40">
+        <div className="flex flex-wrap justify-center gap-8 text-sm text-white/40 max-w-2xl">
           <Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
           <Link to="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
           <Link to="/refund" className="hover:text-white transition-colors">Refund Policy</Link>
+          <Link to="/pricing-services" className="hover:text-white transition-colors">Pricing & Services</Link>
           <Link to="/about" className="hover:text-white transition-colors">About Us</Link>
           <Link to="/contact" className="hover:text-white transition-colors">Contact</Link>
         </div>

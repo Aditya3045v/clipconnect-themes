@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { Check, CreditCard, ChevronDown, HelpCircle } from 'lucide-react';
+import { Check, CreditCard, ChevronDown, HelpCircle, Globe } from 'lucide-react';
 import { load } from '@cashfreepayments/cashfree-js';
 
 const pricingOptions = [
   {
     name: "Standard",
-    price: "499",
+    price: { INR: "499", USD: "6" },
     period: "month",
     description: "Perfect for freelancers and individual developers.",
     features: [
@@ -22,7 +22,7 @@ const pricingOptions = [
   },
   {
     name: "Enterprise",
-    price: "3999",
+    price: { INR: "3999", USD: "48" },
     period: "year",
     description: "The ultimate bundle for teams and agencies.",
     features: [
@@ -46,8 +46,19 @@ const faq = [
 
 export const Pricing = () => {
   const [isProcessing, setIsProcessing] = useState(false);
+  const [currency, setCurrency] = useState<'INR' | 'USD'>('INR');
 
-  const handlePayment = async (amount: number) => {
+  React.useEffect(() => {
+    // Auto-detect if user is outside India to default to USD
+    try {
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      if (tz && !tz.includes('Calcutta') && !tz.includes('Kolkata') && !tz.includes('Asia/Colombo')) {
+        setCurrency('USD');
+      }
+    } catch(e) {}
+  }, []);
+
+  const handlePayment = async (amount: number, selectedCurrency: string) => {
     setIsProcessing(true);
     try {
       const response = await fetch('/api/create-order', {
@@ -55,6 +66,7 @@ export const Pricing = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           amount,
+          currency: selectedCurrency,
           customerId: `user_${Math.floor(Math.random() * 1000000)}`,
           customerPhone: "9999999999",
           customerEmail: "customer@example.com"
@@ -62,7 +74,7 @@ export const Pricing = () => {
       });
 
       const order = await response.json();
-      const cashfree = await load({ mode: "sandbox" });
+      const cashfree = await load({ mode: "production" });
       const checkoutOptions = {
         paymentSessionId: order.payment_session_id,
         redirectTarget: "_self",
@@ -70,7 +82,7 @@ export const Pricing = () => {
       await cashfree.checkout(checkoutOptions);
     } catch (error) {
       console.error('Payment failed:', error);
-      alert('Payment flow is still being integrated in sandbox mode.');
+      alert('Payment initialization failed. Please try again.');
     } finally {
       setIsProcessing(false);
     }
@@ -91,10 +103,30 @@ export const Pricing = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="text-xl text-white/50 max-w-2xl mx-auto"
+            className="text-xl text-white/50 max-w-2xl mx-auto mb-10"
           >
             Pay once, build forever. Transparent pricing with no hidden fees or monthly lock-ins.
           </motion.p>
+          
+          <div className="flex justify-center items-center gap-4">
+            <div className="glass p-2 rounded-full inline-flex border border-white/10 items-center justify-center relative">
+              <button 
+                onClick={() => setCurrency('INR')}
+                className={`relative px-6 py-2 rounded-full text-sm font-bold transition-colors z-10 ${currency === 'INR' ? 'text-dark' : 'text-white/50 hover:text-white'}`}
+              >
+                {currency === 'INR' && <motion.div layoutId="currency-pill" className="absolute inset-0 bg-white rounded-full -z-10" />}
+                ₹ INR
+              </button>
+              <button 
+                onClick={() => setCurrency('USD')}
+                className={`relative px-6 py-2 rounded-full text-sm font-bold transition-colors z-10 ${currency === 'USD' ? 'text-dark' : 'text-white/50 hover:text-white'}`}
+              >
+                {currency === 'USD' && <motion.div layoutId="currency-pill" className="absolute inset-0 bg-white rounded-full -z-10" />}
+                $ USD
+              </button>
+            </div>
+            <p className="text-white/30 text-xs flex items-center gap-1"><Globe size={12}/> Auto-localized</p>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto mb-40">
@@ -115,7 +147,7 @@ export const Pricing = () => {
               <p className={plan.highlight ? "text-dark/50 mb-8" : "text-white/50 mb-8"}>{plan.description}</p>
               
               <div className="flex items-baseline gap-2 mb-10">
-                <span className="text-6xl md:text-8xl font-extrabold tracking-tighter">₹{plan.price}</span>
+                <span className="text-6xl md:text-8xl font-extrabold tracking-tighter">{currency === 'INR' ? '₹' : '$'}{plan.price[currency]}</span>
                 <span className={plan.highlight ? "text-dark/40 text-xl" : "text-white/40 text-xl"}>/{plan.period}</span>
               </div>
 
@@ -131,7 +163,7 @@ export const Pricing = () => {
               </div>
 
               <button 
-                onClick={() => handlePayment(parseInt(plan.price))}
+                onClick={() => handlePayment(parseInt(plan.price[currency]), currency)}
                 disabled={isProcessing}
                 className={plan.highlight ? "w-full bg-dark text-white py-6 rounded-3xl font-cabin font-black text-2xl" : "w-full bg-white text-dark py-6 rounded-3xl font-cabin font-black text-2xl"}
               >

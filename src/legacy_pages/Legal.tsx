@@ -53,3 +53,29 @@ export const Refund = () => (
     <p>Refunds are not available for users who have already cloned or remixed more than 5 distinct themes into their Lovable accounts or have shared their login credentials with unauthorized third parties.</p>
   </LegalLayout>
 );
+
+export const PricingAndServices = () => (
+  <LegalLayout title="Pricing & Services">
+    <p>Last updated: April 2026</p>
+    <h2 className="text-2xl font-bold text-white">Our Services</h2>
+    <p>Lovable Themes provides premium, production-ready UI templates and themes designed specifically for the Lovable platform. Our digital products include comprehensive design systems, pre-built components, and full application layouts.</p>
+    
+    <h2 className="text-2xl font-bold text-white">Pricing Structure</h2>
+    <p>We offer transparent pricing in both Indian Rupees (INR) and US Dollars (USD) depending on your region. Prices are subject to change without notice.</p>
+    
+    <h3 className="text-xl font-bold text-white mt-8 mb-4">1. Standard Plan</h3>
+    <ul className="list-disc pl-6 space-y-2">
+      <li><strong>Price:</strong> ₹499 INR / $6 USD (per month)</li>
+      <li><strong>Includes:</strong> Access to all 12+ themes, 1 year of weekly updates, personal license (1 project), standard Discord support.</li>
+    </ul>
+
+    <h3 className="text-xl font-bold text-white mt-8 mb-4">2. Enterprise Plan</h3>
+    <ul className="list-disc pl-6 space-y-2">
+      <li><strong>Price:</strong> ₹3999 INR / $48 USD (per year)</li>
+      <li><strong>Includes:</strong> Everything in Standard, lifetime updates, commercial license (unlimited projects), premium support, Figma assets.</li>
+    </ul>
+    
+    <h2 className="text-2xl font-bold text-white mt-8">Delivery Policy</h2>
+    <p>All our products are digital. Upon successful payment, you will receive an instant "remix link" via email to import the theme directly into your account. No physical shipping is involved.</p>
+  </LegalLayout>
+);
