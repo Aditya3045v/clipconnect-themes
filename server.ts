@@ -100,7 +100,7 @@ async function startServer() {
 
   app.post('/api/create-order', async (req, res) => {
     try {
-      const { customerId, customerPhone, customerEmail, amount, currency } = req.body;
+      const { customerId, customerPhone, customerEmail, amount, currency, returnUrl } = req.body;
       const { user } = await getUserProfile(req.headers.authorization);
       
       const request = {
@@ -112,7 +112,9 @@ async function startServer() {
           customer_email: user?.email || customerEmail || "test@example.com"
         },
         order_meta: {
-          return_url: `${process.env.APP_URL || 'http://localhost:3000'}/payment-status?order_id={order_id}`
+          return_url: returnUrl 
+            ? `${returnUrl}/payment-status?order_id={order_id}`
+            : `${process.env.APP_URL || 'https://lovable-themes.netlify.app'}/payment-status?order_id={order_id}`
         }
       };
 

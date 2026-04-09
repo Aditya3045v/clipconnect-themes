@@ -69,20 +69,26 @@ export const Pricing = () => {
           currency: selectedCurrency,
           customerId: `user_${Math.floor(Math.random() * 1000000)}`,
           customerPhone: "9999999999",
-          customerEmail: "customer@example.com"
+          customerEmail: "customer@example.com",
+          returnUrl: window.location.origin
         })
       });
 
       const order = await response.json();
+
+      if (!response.ok || !order.payment_session_id) {
+        throw new Error(order.error || order.message || 'Failed to initialize payment session.');
+      }
+
       const cashfree = await load({ mode: "production" });
       const checkoutOptions = {
         paymentSessionId: order.payment_session_id,
         redirectTarget: "_self",
       };
       await cashfree.checkout(checkoutOptions);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Payment failed:', error);
-      alert('Payment initialization failed. Please try again.');
+      alert(`Payment initialization failed: ${error.message || 'Please try again.'}`);
     } finally {
       setIsProcessing(false);
     }

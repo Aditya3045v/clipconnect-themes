@@ -64,22 +64,29 @@ export const Home = () => {
         },
         body: JSON.stringify({
           amount: amount,
+          currency: 'INR',
           customerId: session.user.id,
           customerPhone: "9999999999",
-          customerEmail: session.user.email
+          customerEmail: session.user.email,
+          returnUrl: window.location.origin
         })
       });
 
       const order = await response.json();
+      
+      if (!response.ok || !order.payment_session_id) {
+        throw new Error(order.error || order.message || 'Failed to initialize payment session.');
+      }
+
       const cashfree = await load({ mode: "production" });
       const checkoutOptions = {
         paymentSessionId: order.payment_session_id,
         redirectTarget: "_self",
       };
       await cashfree.checkout(checkoutOptions);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Payment failed:', error);
-      alert('Payment flow is still being integrated in sandbox mode.');
+      alert(`Payment failed: ${error.message || 'Payment flow is still being integrated in sandbox mode.'}`);
     } finally {
       setIsProcessing(false);
     }
